@@ -2,14 +2,14 @@
 
 int main()
 {
-    // Game object allocated on the heap
-    Game* game = new Game();
+    // Dynamically allocate the Game controller on the heap
+    Game* gameInstance = new Game();   // clearer variable name
 
-    // Use pointer to run the game
-    game->run();
+    // Start the main game loop
+    gameInstance->run();
 
-    // Clean up memory
-    delete game;
+    // Release allocated memory to prevent leaks
+    delete gameInstance;
 
     return 0;
 }
