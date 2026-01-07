@@ -1,15 +1,14 @@
 #include "game.h"
+#include "Tomb1.h"
 #include <iostream>
 
 Game::Game()
 {
-    // Allocate the game title on the heap
     title = new std::string("THE ANCIENT RELIC – TOMB CRAWLER");
 }
 
 Game::~Game()
 {
-    // Free heap memory
     delete title;
 }
 
@@ -39,5 +38,18 @@ void Game::showIntro()
 
 void Game::startGame()
 {
-    std::cout << "\nYour journey into the tombs begins...\n";
+    std::cout << "\nEntering Tomb 1...\n";
+
+    Tomb1 tomb1(10, 6); // width, height
+    bool tomb1Cleared = tomb1.enter(player);  // <-- updated
+
+    if (tomb1Cleared)
+    {
+        std::cout << "\nTomb 1 complete. Tomb 2 will be added next.\n";
+    }
+    else
+    {
+        std::cout << "\nGame Over.\n";
+    }
 }
+

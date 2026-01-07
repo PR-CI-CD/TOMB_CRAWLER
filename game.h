@@ -1,11 +1,7 @@
 #pragma once
 #include <string>
+#include "Player.h"
 
-/*
-    The Game class controls the flow of the program.
-    It is responsible for starting the game, showing the intro,
-    and later will manage the tombs and player.
-*/
 class Game
 {
 public:
@@ -15,8 +11,8 @@ public:
     void run();
 
 private:
-    // Dynamically allocated title string
     std::string* title;
+    Player player;
 
     void showIntro();
     void startGame();
