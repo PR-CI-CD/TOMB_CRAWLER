@@ -1,6 +1,8 @@
 #include "game.h"
 #include "Tomb1.h"
+#include "Room.h"
 #include <iostream>
+#include <memory>
 
 Game::Game()
 {
@@ -40,8 +42,14 @@ void Game::startGame()
 {
     std::cout << "\nEntering Tomb 1...\n";
 
-    Tomb1 tomb1(10, 6); // width, height
-    bool tomb1Cleared = tomb1.enter(player);  // <-- updated
+    /*
+        Create the room using a smart pointer to the base class.
+        This demonstrates polymorphism and scalable design:
+        Game does not need to know which specific room it is running.
+    */
+    std::unique_ptr<Room> room = std::make_unique<Tomb1>(10, 6);
+
+    bool tomb1Cleared = room->enter(player);
 
     if (tomb1Cleared)
     {
@@ -52,4 +60,5 @@ void Game::startGame()
         std::cout << "\nGame Over.\n";
     }
 }
+
 
