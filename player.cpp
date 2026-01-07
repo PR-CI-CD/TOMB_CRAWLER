@@ -2,6 +2,7 @@
 
 Player::Player()
 {
+    // Initialise player starting state
     health = 100;
     tomb2Key = false;
 }
@@ -13,13 +14,20 @@ int Player::getHealth() const
 
 bool Player::isAlive() const
 {
+    // Player is alive if health is greater than zero
     return health > 0;
 }
 
 void Player::takeDamage(int amount)
 {
+    // Reduce health by the damage amount
     health -= amount;
-    if (health < 0) health = 0;
+
+    // Prevent health from going below zero
+    if (health < 0)
+    {
+        health = 0;
+    }
 }
 
 bool Player::hasTomb2Key() const
@@ -29,5 +37,7 @@ bool Player::hasTomb2Key() const
 
 void Player::giveTomb2Key()
 {
+    // Player now owns the key to Tomb 2
     tomb2Key = true;
 }
+
