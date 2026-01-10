@@ -8,7 +8,7 @@
 static void clearScreen()
 {
     // ANSI escape codes: clear screen + move cursor to top-left
-    std::cout << "\x1B[2J\x1B[H";
+    std::cout << "\x1B[2J\x1B[H" << std::flush;
 }
 
 Tomb1::Tomb1(int width, int height)
@@ -20,6 +20,7 @@ Tomb1::Tomb1(int width, int height)
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     grid = nullptr;
+    statusMessage = "Find the key, then reach the door (D).";
 
     allocateGrid();
     buildRoomLayout();
@@ -91,7 +92,7 @@ void Tomb1::buildRoomLayout()
 
 void Tomb1::drawRoom(const Player& player) const
 {
-    std::cout << "\n--- TOMB 1: The Entrance Chamber ---\n";
+    std::cout << "--- TOMB 1: The Entrance Chamber ---\n";
     std::cout << "Health: " << player.getHealth()
               << " | Key: " << (player.hasTomb2Key() ? "YES" : "NO") << "\n\n";
 
@@ -120,6 +121,8 @@ void Tomb1::drawRoom(const Player& player) const
     }
 
     std::cout << "\nControls: F=Forward  B=Back  L=Left  R=Right  A=Attack  Q=Quit\n";
+    std::cout << "------------------------------------------------------------\n";
+    std::cout << statusMessage << "\n";
 }
 
 bool Tomb1::handleMove(char moveCommand, Player& player)
@@ -135,7 +138,7 @@ bool Tomb1::handleMove(char moveCommand, Player& player)
     // Keep the player inside the grid
     if (nextX < 0 || nextX >= gridWidth || nextY < 0 || nextY >= gridHeight)
     {
-        std::cout << "You bump into a cold stone wall.\n";
+        statusMessage = "You bump into a cold stone wall.";
         return true; // still inside Tomb 1
     }
 
@@ -154,11 +157,19 @@ bool Tomb1::handleMove(char moveCommand, Player& player)
     {
         if (player.hasTomb2Key())
         {
-            std::cout << "You unlock the door to Tomb 2 and step through...\n";
+            statusMessage = "You unlock the door to Tomb 2 and step through...";
             return false; // leaving Tomb 1
         }
 
-        std::cout << "The door is locked. You need a key.\n";
+        statusMessage = "The door is locked. You need a key.";
+    }
+    else
+    {
+        // Only update movement feedback if we didn't trigger something else
+        if (statusMessage.empty())
+        {
+            statusMessage = "You move deeper into the tomb...";
+        }
     }
 
     return true;
@@ -168,29 +179,27 @@ void Tomb1::onEnemyEncounter(Player& player)
 {
     if (!enemy) return;
 
-    std::cout << "\nYou bump into " << enemy->getName() << "!\n";
-
-    int damage = enemy->attack();
-    std::cout << enemy->getName() << " attacks first and deals " << damage << " damage!\n";
-
+    const int damage = enemy->attack();
     player.takeDamage(damage);
 
     if (!player.isAlive())
     {
-        std::cout << "You collapse in the darkness...\n";
+        statusMessage = "Goblek attacks and you collapse in the darkness...";
         return;
     }
 
-    std::cout << "Press A to attack back...\n";
+    statusMessage = "You bump into Goblek! It attacks for " + std::to_string(damage) +
+                    " damage. Press A to attack back.";
 }
 
 bool Tomb1::enter(Player& player)
 {
     /*
         Polymorphic entry point.
-        Game can call this through a Room* pointer later, e.g. rooms[i]->enter(player).
+        Game can call this through a Room* or std::unique_ptr<Room>.
     */
     bool stillInTomb1 = true;
+    statusMessage = "Find the key, then reach the door (D).";
 
     while (stillInTomb1)
     {
@@ -199,15 +208,16 @@ bool Tomb1::enter(Player& player)
             return false; // player died
         }
 
-        clearScreen();     
+        clearScreen();
         drawRoom(player);
 
-        std::cout << "> ";
+        std::cout << "\n> ";
         std::string input;
         std::getline(std::cin, input);
 
         if (input.empty())
         {
+            statusMessage = "Enter a command: F, B, L, R, A, or Q.";
             continue;
         }
 
@@ -215,7 +225,9 @@ bool Tomb1::enter(Player& player)
 
         if (command == 'Q')
         {
-            std::cout << "You retreat to the surface...\n";
+            statusMessage = "You retreat to the surface...";
+            clearScreen();
+            drawRoom(player);
             return false;
         }
 
@@ -224,15 +236,13 @@ bool Tomb1::enter(Player& player)
         {
             if (enemy && enemy->isAlive() && playerX == enemyX && playerY == enemyY)
             {
-                std::cout << "You strike with your blade — " << enemy->getName() << " is defeated!\n";
                 enemy->kill();
-
-                std::cout << enemy->getName() << " drops a key to Tomb 2.\n";
                 player.giveTomb2Key();
+                statusMessage = "You strike down Goblek! It drops a key to Tomb 2.";
             }
             else
             {
-                std::cout << "You swing at the air.\n";
+                statusMessage = "You swing at the air.";
             }
 
             continue;
@@ -242,11 +252,12 @@ bool Tomb1::enter(Player& player)
         if (command == 'F' || command == 'B' || command == 'L' || command == 'R')
         {
             // handleMove returns false only when player exits through door with key
+            statusMessage.clear(); // allow move to set a relevant message
             stillInTomb1 = handleMove(command, player);
         }
         else
         {
-            std::cout << "Unknown command.\n";
+            statusMessage = "Unknown command. Use F, B, L, R, A or Q.";
         }
     }
 

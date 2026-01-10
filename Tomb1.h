@@ -1,6 +1,7 @@
 #pragma once
 
-#include <memory>      // std::unique_ptr, std::make_unique
+#include <memory>   // std::unique_ptr, std::make_unique
+#include <string>   // std::string
 #include "Room.h"
 #include "Player.h"
 #include "Enemy.h"
@@ -8,11 +9,12 @@
 /*
     Tomb1 inherits from Room to demonstrate polymorphism.
 
-    Key assessment features present here:
+    Key assessment features:
     - Polymorphism: Tomb1 : Room, overrides enter(Player&)
     - Dynamic arrays: char** grid created with new[] and freed with delete[]
-    - Pointers: grid uses raw pointers (manual memory management), enemy uses smart pointer
+    - Pointers: grid uses raw pointers (manual memory management)
     - Smart pointers (rewarded): std::unique_ptr<Enemy> for exclusive ownership (RAII)
+    - UI improvement: statusMessage buffer prints feedback at bottom of screen
 */
 class Tomb1 : public Room
 {
@@ -44,6 +46,9 @@ private:
     // Door position (locked unless player has key)
     int doorX;
     int doorY;
+
+    // UI message shown at the bottom of the screen
+    std::string statusMessage;
 
     void allocateGrid();
     void freeGrid();
