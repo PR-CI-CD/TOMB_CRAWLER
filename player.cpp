@@ -5,6 +5,9 @@ Player::Player()
     // Initialise player starting state
     health = 100;
     tomb2Key = false;
+
+    // NEW
+    relic = false;
 }
 
 int Player::getHealth() const
@@ -39,5 +42,15 @@ void Player::giveTomb2Key()
 {
     // Player now owns the key to Tomb 2
     tomb2Key = true;
+}
+
+bool Player::hasRelic() const
+{
+    return relic;
+}
+
+void Player::giveRelic()
+{
+    relic = true;
 }
 

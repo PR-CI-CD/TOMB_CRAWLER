@@ -1,6 +1,7 @@
 #include "game.h"
-#include "Tomb1.h"
 #include "Room.h"
+#include "Tomb1.h"
+#include "Tomb2.h"
 #include <iostream>
 #include <memory>
 
@@ -12,6 +13,7 @@ Game::Game()
 Game::~Game()
 {
     delete title;
+    title = nullptr;
 }
 
 void Game::run()
@@ -31,7 +33,7 @@ void Game::showIntro()
     std::cout << "The Goblin King has taken it into the underground tombs.\n\n";
 
     std::cout << "You are the last warrior.\n";
-    std::cout << "Your mission is to retrieve the relic and save the world.\n\n";
+    std::cout << "Retrieve the relic...\n\n";
 
     std::cout << "Press ENTER to begin...";
     std::string input;
@@ -42,23 +44,32 @@ void Game::startGame()
 {
     std::cout << "\nEntering Tomb 1...\n";
 
-    /*
-        Create the room using a smart pointer to the base class.
-        This demonstrates polymorphism and scalable design:
-        Game does not need to know which specific room it is running.
-    */
-    std::unique_ptr<Room> room = std::make_unique<Tomb1>(10, 6);
+    // Use polymorphism + smart pointers (rewarded)
+    std::unique_ptr<Room> room1 = std::make_unique<Tomb1>(10, 6);
+    bool tomb1Cleared = room1->enter(player);
 
-    bool tomb1Cleared = room->enter(player);
-
-    if (tomb1Cleared)
+    if (!tomb1Cleared)
     {
-        std::cout << "\nTomb 1 complete. Tomb 2 will be added next.\n";
+        std::cout << "\nGame Over.\n";
+        return;
+    }
+
+    std::cout << "\nTomb 1 complete. Entering Tomb 2...\n";
+
+    std::unique_ptr<Room> room2 = std::make_unique<Tomb2>(10, 6);
+    bool tomb2Cleared = room2->enter(player);
+
+    if (tomb2Cleared && player.hasRelic())
+    {
+        std::cout << "\nYOU ESCAPED WITH THE RELIC!\n";
+        std::cout << "The land begins to heal. Rivers flow again.\n";
+        std::cout << "Victory!\n";
     }
     else
     {
         std::cout << "\nGame Over.\n";
     }
 }
+
 
 
