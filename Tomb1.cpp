@@ -5,6 +5,12 @@
 #include <cstdlib>  // rand, srand
 #include <ctime>    // time
 
+static void clearScreen()
+{
+    // ANSI escape codes: clear screen + move cursor to top-left
+    std::cout << "\x1B[2J\x1B[H";
+}
+
 Tomb1::Tomb1(int width, int height)
 {
     gridWidth = width;
@@ -193,6 +199,7 @@ bool Tomb1::enter(Player& player)
             return false; // player died
         }
 
+        clearScreen();     
         drawRoom(player);
 
         std::cout << "> ";
