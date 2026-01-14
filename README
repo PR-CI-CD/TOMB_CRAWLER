@@ -4,7 +4,7 @@ g++ main.cpp game.cpp Player.cpp Enemy.cpp Tomb1.cpp Tomb2.cpp -o relic_game
 
 #Instructions
 
-To run the game, make sure you are in the TOMB_CRAWLER directory in your IDE, copy and past the command into the terminal and hit enter.
+To run the game, make sure you are in the TOMB_CRAWLER directory in your IDE, copy and paste the command into the terminal and hit enter.
 
 #Controls
 f = forward
